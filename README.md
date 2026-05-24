@@ -1,0 +1,1 @@
+This is a simple fruit slot machine game I made using a locally hosted OpenCode installation. The base game only took a few iterations to get to a working state, although I had to correct the games broken logic with a few rounds of fix requests based on incorrectly filled out info from the initial build request. 
