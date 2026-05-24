@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin to Win</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  background: linear-gradient(135deg, #1a0a0a 0%, #2d0a0a 50%, #1a0a0a 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Georgia', serif;
+  overflow: hidden;
+}
+
+.slot-machine {
+  width: 620px;
+  background: linear-gradient(180deg, #8b0000 0%, #cc0000 30%, #8b0000 70%, #5a0000 100%);
+  border-radius: 20px 20px 30px 30px;
+  border: 6px solid #3d0000;
+  box-shadow: 0 0 60px rgba(180, 0, 0, 0.4), inset 0 0 30px rgba(0,0,0,0.3);
+  padding: 0 20px 20px;
+  position: relative;
+}
+
+.title {
+  text-align: center;
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 2px 2px 4px #000;
+  padding: 15px 0 10px;
+  letter-spacing: 6px;
+  font-family: 'Georgia', serif;
+}
+
+.title-decoration {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.title-decoration span {
+  color: #ffd700;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.wheels-container {
+  display: flex;
+  gap: 12px;
+  padding: 15px;
+  background: linear-gradient(180deg, #2a0000, #1a0000);
+  border-radius: 15px;
+  border: 4px solid #3d0000;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+  margin: 0 10px;
+  position: relative;
+}
+
+.wheel {
+  flex: 1;
+  height: 140px;
+  background: linear-gradient(180deg, #f5f5dc 0%, #fff8dc 40%, #f5f5dc 100%);
+  border-radius: 10px;
+  border: 4px solid #5a0000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.wheel-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+}
+
+.wheel.spinning .wheel-inner {
+  animation: spin 0.08s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-140px); }
+}
+
+.wheel-label {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.fruit-lime {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background: radial-gradient(circle at 40% 35%, #b2ff66, #5a9e00);
+  border-radius: 50%;
+  border: 3px solid #2d5a00;
+  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.2);
+  position: relative;
+}
+.fruit-lime::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 8px;
+  background: #2d5a00;
+  border-radius: 2px;
+}
+
+.handle-section {
+  position: absolute;
+  right: -55px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.handle-base {
+  width: 20px;
+  height: 60px;
+  background: linear-gradient(180deg, #666, #444);
+  border-radius: 5px;
+  border: 2px solid #333;
+  position: relative;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+.handle-grip {
+  width: 40px;
+  height: 30px;
+  background: radial-gradient(circle at 40% 40%, #ff4444, #cc0000);
+  border-radius: 50%;
+  border: 3px solid #8b0000;
+  position: absolute;
+  top: -10px;
+  left: -12px;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+  transition: all 0.15s;
+}
+
+.handle-grip:hover {
+  background: radial-gradient(circle at 40% 40%, #ff6666, #ee0000);
+  transform: scale(1.05);
+}
+
+.handle-grip:active {
+  transform: translateY(5px) scale(0.95);
+}
+
+.handle-grip.pulled {
+  transform: translateY(15px) scale(0.95);
+}
+
+.info-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  margin: 10px 15px 0;
+  background: linear-gradient(180deg, #2a0000, #1a0000);
+  border-radius: 10px;
+  border: 3px solid #3d0000;
+}
+
+.balance {
+  color: #ffd700;
+  font-size: 22px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.balance span {
+  color: #fff;
+}
+
+.bet {
+  color: #ff9999;
+  font-size: 16px;
+}
+
+.message-area {
+  text-align: center;
+  padding: 8px 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  min-height: 40px;
+}
+
+.message-area.game-over {
+  color: #ff0000;
+  text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+  font-size: 36px;
+  animation: flash 0.5s ease-in-out infinite alternate;
+}
+
+.message-area.win-message {
+  color: #00ff00;
+  text-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+  font-size: 42px;
+  animation: flash 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes flash {
+  from { opacity: 0.6; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.05); }
+}
+
+.coin-tray {
+  margin: 15px 25px 10px;
+  height: 80px;
+  background: linear-gradient(180deg, #3a3a3a, #2a2a2a, #3a3a3a);
+  border-radius: 0 0 15px 15px;
+  border: 4px solid #555;
+  border-top: 6px solid #666;
+  box-shadow: inset 0 -5px 15px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tray-coins {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 10px;
+  transition: all 0.3s;
+}
+
+.tray-coin {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  background: radial-gradient(circle at 35% 35%, #ffd700, #daa520, #b8860b);
+  border-radius: 50%;
+  border: 2px solid #b8860b;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+  animation: coinDrop 0.5s ease-out;
+  cursor: pointer;
+  transition: transform 0.1s;
+  position: relative;
+}
+
+.tray-coin:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+.tray-coin.collected {
+  animation: coinCollect 0.3s ease-in forwards;
+}
+
+@keyframes coinDrop {
+  0% { transform: translateY(-60px) rotate(-180deg); opacity: 0; }
+  60% { transform: translateY(5px) rotate(10deg); opacity: 1; }
+  80% { transform: translateY(-3px) rotate(-5deg); }
+  100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+
+@keyframes coinCollect {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0) translateY(-30px); opacity: 0; }
+}
+
+.tray-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #777;
+  font-size: 14px;
+  font-style: italic;
+  pointer-events: none;
+}
+
+.win-display {
+  text-align: center;
+  padding: 5px 0;
+  color: #ffd700;
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  min-height: 40px;
+}
+
+.lamp {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 5px;
+}
+
+.lamp.on {
+  background: #ff0;
+  box-shadow: 0 0 10px #ff0, 0 0 20px #ff0;
+}
+
+.lamp.off {
+  background: #440;
+}
+
+.lamps {
+  text-align: center;
+  padding: 5px 0;
+}
+</style>
+</head>
+<body>
+
+<div class="slot-machine" id="machine">
+  <div class="title-decoration">
+    <span>◆</span><span>✦</span><span>◆</span>
+  </div>
+  <div class="title">SPIN TO WIN</div>
+  <div class="title-decoration">
+    <span>◆</span><span>✦</span><span>◆</span>
+  </div>
+
+  <div class="lamps" id="lamps">
+    <span class="lamp off"></span>
+    <span class="lamp off"></span>
+    <span class="lamp off"></span>
+    <span class="lamp off"></span>
+    <span class="lamp off"></span>
+  </div>
+
+  <div class="wheels-container">
+    <div class="wheel" id="wheel1"><div class="wheel-inner"></div></div>
+    <div class="wheel" id="wheel2"><div class="wheel-inner"></div></div>
+    <div class="wheel" id="wheel3"><div class="wheel-inner"></div></div>
+
+    <div class="handle-section">
+      <div class="handle-base">
+        <div class="handle-grip" id="handle"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <div class="balance">Score: <span id="score">500</span></div>
+    <div class="bet">Spin cost: 50</div>
+  </div>
+
+  <div class="message-area" id="message"></div>
+
+  <div class="coin-tray" id="coinTray">
+    <div class="tray-coins" id="trayCoins"></div>
+    <div class="tray-hint" id="trayHint">Coins appear here when you win!</div>
+  </div>
+</div>
+
+<script>
+const fruits = [
+  { emoji: '🍋', name: 'Lemon', value: 10000 },
+  { emoji: '🟢', name: 'Lime', value: 8000 },
+  { emoji: '🍊', name: 'Orange', value: 6000 },
+  { emoji: '🍒', name: 'Cherry', value: 5000 },
+  { emoji: '🍉', name: 'Watermelon', value: 1000 },
+  { emoji: '🍑', name: 'Peach', value: 500 },
+  { emoji: '🍎', name: 'Apple', value: 250 },
+];
+
+const wheelEls = [
+  document.getElementById('wheel1'),
+  document.getElementById('wheel2'),
+  document.getElementById('wheel3'),
+];
+const handleEl = document.getElementById('handle');
+const scoreEl = document.getElementById('score');
+const messageEl = document.getElementById('message');
+const lampEls = document.querySelectorAll('.lamp');
+const trayCoinsEl = document.getElementById('trayCoins');
+const trayHint = document.getElementById('trayHint');
+
+let score = 500;
+let isSpinning = false;
+let trayTotal = 0;
+let currentResult = null;
+
+function getRandomFruit() {
+  return fruits[Math.floor(Math.random() * fruits.length)];
+}
+
+function fruitInnerHTML(f) {
+  const emoji = f.emoji === '🟢' ? '<span class="fruit-lime"></span>' : f.emoji;
+  return `<div style="font-size:48px;line-height:1">${emoji}</div><div class="wheel-label">${f.name}</div>`;
+}
+
+function initWheels() {
+  wheelEls.forEach(w => {
+    const inner = w.querySelector('.wheel-inner');
+    inner.innerHTML = fruitInnerHTML(getRandomFruit());
+  });
+}
+
+function flashLamps() {
+  lampEls.forEach((l, i) => {
+    setTimeout(() => {
+      l.className = 'lamp on';
+    }, i * 100);
+  });
+}
+
+function resetLamps() {
+  lampEls.forEach(l => { l.className = 'lamp off'; });
+}
+
+function updateScore() {
+  scoreEl.textContent = score;
+}
+
+function setMessage(text, type) {
+  messageEl.textContent = text;
+  messageEl.className = 'message-area';
+  if (type) messageEl.classList.add(type);
+}
+
+function clearCoins() {
+  trayCoinsEl.innerHTML = '';
+  trayHint.style.display = 'block';
+  trayTotal = 0;
+  currentResult = null;
+}
+
+function addWinningCoins(winAmount) {
+  trayHint.style.display = 'none';
+  trayTotal = winAmount;
+
+  const numCoins = Math.min(Math.max(Math.floor(winAmount / 50), 1), 60);
+
+  for (let i = 0; i < numCoins; i++) {
+    setTimeout(() => {
+      const coin = document.createElement('span');
+      coin.className = 'tray-coin';
+      coin.style.marginLeft = (Math.random() - 0.5) * 10 + 'px';
+      coin.dataset.value = Math.floor(winAmount / numCoins);
+      coin.title = `+${Math.floor(winAmount / numCoins)}`;
+      trayCoinsEl.appendChild(coin);
+    }, i * 60);
+  }
+}
+
+function collectCoins() {
+  if (trayTotal <= 0) return;
+  const coins = trayCoinsEl.querySelectorAll('.tray-coin:not(.collected)');
+  coins.forEach((c, i) => {
+    setTimeout(() => {
+      c.classList.add('collected');
+      setTimeout(() => {
+        if (c.parentNode) c.parentNode.removeChild(c);
+      }, 300);
+    }, i * 30);
+  });
+
+  setTimeout(() => {
+    score += trayTotal;
+    updateScore();
+    setMessage(`+${trayTotal} coins collected!`, '');
+
+    if (score >= 25000) {
+      setMessage('YOU WON !', 'win-message');
+      setTimeout(() => {
+        score = 500;
+        updateScore();
+        clearCoins();
+        initWheels();
+        setMessage('New game! Try again!', '');
+      }, 3000);
+    }
+
+    trayTotal = 0;
+    currentResult = null;
+    if (trayCoinsEl.children.length === 0 || trayCoinsEl.querySelectorAll('.tray-coin:not(.collected)').length === 0) {
+      trayHint.style.display = 'block';
+    }
+  }, coins.length * 30 + 350);
+}
+
+document.getElementById('coinTray').addEventListener('click', collectCoins);
+
+function spin() {
+  if (isSpinning) return;
+  if (score < 50) {
+    setMessage('Game Over', 'game-over');
+    setTimeout(() => {
+      score = 500;
+      updateScore();
+      clearCoins();
+      initWheels();
+      setMessage('New game starting...', '');
+    }, 2500);
+    return;
+  }
+
+  isSpinning = true;
+  handleEl.classList.add('pulled');
+  resetLamps();
+  clearCoins();
+  setMessage('Spinning...', '');
+  score -= 50;
+  updateScore();
+
+  const spinDuration = 1200;
+  const result = [getRandomFruit(), getRandomFruit(), getRandomFruit()];
+
+  const spinIntervals = [];
+  wheelEls.forEach((w, i) => {
+    w.classList.add('spinning');
+    const inner = w.querySelector('.wheel-inner');
+    let spinCount = 0;
+    const intervalId = setInterval(() => {
+      const f = getRandomFruit();
+      inner.innerHTML = fruitInnerHTML(f);
+      spinCount++;
+      if (spinCount > 10 + i * 3) {
+        clearInterval(intervalId);
+      }
+    }, 60);
+    spinIntervals.push(intervalId);
+  });
+
+  setTimeout(() => {
+    flashLamps();
+  }, 100);
+
+  setTimeout(() => {
+    spinIntervals.forEach(id => clearInterval(id));
+
+    wheelEls.forEach((w, i) => {
+      w.classList.remove('spinning');
+      const inner = w.querySelector('.wheel-inner');
+      inner.innerHTML = fruitInnerHTML(result[i]);
+    });
+
+    handleEl.classList.remove('pulled');
+    isSpinning = false;
+
+    const f1 = result[0], f2 = result[1], f3 = result[2];
+
+    if (f1.name === f2.name && f2.name === f3.name) {
+      currentResult = f1;
+      const winAmount = f1.value;
+      setMessage(`${f1.emoji} JACKPOT! ${f1.name} x3 = ${winAmount}`, '');
+      setTimeout(() => addWinningCoins(winAmount), 300);
+    } else if (f1.name === f2.name || f2.name === f3.name) {
+      let winAmount = 0;
+      let matched = '';
+      if (f1.name === f2.name) { winAmount = f1.value; matched = f1.emoji + ' ' + f1.name; }
+      else if (f2.name === f3.name) { winAmount = f2.value; matched = f2.emoji + ' ' + f2.name; }
+      winAmount = Math.floor(winAmount / 4);
+      currentResult = { name: matched, value: winAmount };
+      setMessage(`Pair! ${matched} = ${winAmount}`, '');
+      setTimeout(() => addWinningCoins(winAmount), 300);
+    } else {
+      setMessage('No match. Try again!', '');
+    }
+
+    if (score < 50) {
+      setTimeout(() => {
+        setMessage('Game Over', 'game-over');
+        setTimeout(() => {
+          score = 500;
+          updateScore();
+          clearCoins();
+          initWheels();
+          setMessage('New game starting...', '');
+        }, 2500);
+      }, 1500);
+    }
+  }, spinDuration);
+}
+
+handleEl.addEventListener('click', spin);
+
+initWheels();
+setMessage('Pull the handle to spin!', '');
+</script>
+</body>
+</html>
